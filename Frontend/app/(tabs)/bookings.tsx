@@ -1,21 +1,21 @@
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
-export default function HotelsScreen() {
+export default function BookingsScreen() {
   return (
     <ScrollView style={styles.container}>
       <ThemedView style={styles.content}>
         <ThemedText type="title" style={styles.title}>
-          Hotels
+          My Bookings
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Browse available hotels and book your stay
+          View and manage your hotel reservations
         </ThemedText>
 
         <View style={styles.emptyState}>
           <ThemedText style={styles.emptyText}>
-            Hotel listings coming soon. Check back later!
+            No bookings yet. Start exploring hotels to make your first booking!
           </ThemedText>
         </View>
       </ThemedView>
@@ -52,3 +52,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
