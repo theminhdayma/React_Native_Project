@@ -43,11 +43,11 @@ public class AuthServiceImpl implements AuthService {
 
         // Create new user
         User user = new User();
-        // Combine firstName and lastName into name field
-        String fullName = (request.getFirstName() + " " + request.getLastName()).trim();
-        user.setName(fullName);
+        user.setName(request.getName().trim());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhone());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setGender(request.getGender());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setVerified(false);
         user.setAvatar(null);
@@ -71,13 +71,18 @@ public class AuthServiceImpl implements AuthService {
         // Send verification email asynchronously
         sendEmailAsync(request.getEmail(), otp);
 
+        // Extract firstName and lastName from name for response (for backward compatibility)
+        String[] nameParts = user.getName() != null ? user.getName().split(" ", 2) : new String[]{"", ""};
+        String firstName = nameParts.length > 0 ? nameParts[0] : "";
+        String lastName = nameParts.length > 1 ? nameParts[1] : "";
+
         return AuthResponse.builder()
                 .token(token)
                 .type("Bearer")
                 .id(user.getId())
                 .email(user.getEmail())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .firstName(firstName)
+                .lastName(lastName)
                 .build();
     }
 

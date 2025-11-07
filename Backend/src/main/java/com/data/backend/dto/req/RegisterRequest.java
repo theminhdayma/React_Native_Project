@@ -1,5 +1,6 @@
 package com.data.backend.dto.req;
 
+import com.data.backend.model.constants.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -9,21 +10,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class RegisterRequest {
     
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
-    @Pattern(regexp = "^[a-zA-ZÀ-ỹ\\s]+$", message = "First name can only contain letters and spaces")
-    private String firstName;
-
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
-    @Pattern(regexp = "^[a-zA-ZÀ-ỹ\\s]+$", message = "Last name can only contain letters and spaces")
-    private String lastName;
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @Pattern(regexp = "^[a-zA-ZÀ-ỹ\\s]+$", message = "Name can only contain letters and spaces")
+    private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
@@ -40,6 +38,7 @@ public class RegisterRequest {
     @Pattern(regexp = "^[0-9+\\-\\s()]*$", message = "Phone number contains invalid characters")
     private String phone;
 
-    @Size(max = 200, message = "Address must not exceed 200 characters")
-    private String address;
+    private LocalDate dateOfBirth;
+
+    private Gender gender;
 }

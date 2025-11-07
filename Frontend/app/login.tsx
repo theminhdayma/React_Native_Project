@@ -30,15 +30,62 @@ export default function LoginScreen() {
       return;
     }
 
+    // Validate email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email.trim())) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+    
+    // Validate password length (backend requires 6-20 chars)
+    if (formData.password.length < 6 || formData.password.length > 20) {
+      Alert.alert('Error', 'Password must be between 6 and 20 characters');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await login({
-        email: formData.email,
+      const loginData = {
+        email: formData.email.trim(),
         password: formData.password,
-      });
+      };
+      
+      console.log('Attempting login for:', loginData.email);
+      await login(loginData);
+      console.log('Login successful');
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Login failed');
+      console.error('Login error:', error);
+      const errorMessage = error.message || error.response?.data?.message || 'Login failed';
+      
+      // Check if account is not verified
+      if (errorMessage.includes('not verified') || errorMessage.includes('verification') || errorMessage.includes('Account not verified')) {
+        Alert.alert(
+          'Account Not Verified',
+          'Please verify your email address before logging in. Would you like to go to verification page?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'Verify Email',
+              onPress: () => {
+                router.push({
+                  pathname: '/verify-email',
+                  params: { email: formData.email.trim() },
+                });
+              },
+            },
+          ]
+        );
+      } else if (errorMessage.includes('User not found')) {
+        Alert.alert('Error', 'Email not found. Please check your email or register a new account.');
+      } else if (errorMessage.includes('Invalid password')) {
+        Alert.alert('Error', 'Invalid password. Please try again.');
+      } else {
+        Alert.alert('Login Failed', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +192,10 @@ export default function LoginScreen() {
           </View>
 
           {/* Forgot Password */}
-          <TouchableOpacity style={styles.forgotPasswordContainer}>
+          <TouchableOpacity 
+            style={styles.forgotPasswordContainer}
+            onPress={() => router.push({ pathname: '/forgot-password' as any })}
+          >
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 

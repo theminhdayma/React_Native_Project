@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthResponse, authService, LoginRequest, RegisterRequest } from '../services/authService';
+import { authService } from '../services/authService';
+import type { AuthResponse, LoginRequest, RegisterRequest } from '@/types';
 
 interface AuthContextType {
   user: AuthResponse | null;
@@ -8,7 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<AuthResponse>;
   logout: () => Promise<void>;
 }
 
@@ -58,13 +59,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (data: RegisterRequest) => {
     try {
       const response = await authService.register(data);
-      setToken(response.token);
-      setUser(response);
-      
-      await AsyncStorage.setItem(TOKEN_KEY, response.token);
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(response));
+      // Don't save token/user yet - user needs to verify email first
+      // Token will be saved after email verification
+      return response;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
+      // Preserve the original error message from backend
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      const customError = new Error(errorMessage);
+      (customError as any).response = error.response;
+      throw customError;
     }
   };
 

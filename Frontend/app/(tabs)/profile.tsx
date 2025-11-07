@@ -40,7 +40,7 @@ export default function ProfileScreen() {
             <View style={styles.infoRow}>
               <ThemedText style={styles.label}>Name:</ThemedText>
               <ThemedText style={styles.value}>
-                {user.firstName} {user.lastName}
+                {[user.firstName, user.lastName].filter(Boolean).join(' ') || 'User'}
               </ThemedText>
             </View>
             <View style={styles.infoRow}>
